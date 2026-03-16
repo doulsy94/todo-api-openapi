@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import connexion
-
+from prometheus_flask_exporter import PrometheusMetrics
 from openapi_server import encoder
 
 
@@ -12,6 +12,14 @@ def main():
                 arguments={'title': 'To-Do List API'},
                 pythonic_params=True)
 
+    # Récupérer l'application Flask sous-jacente
+    flask_app = app.app
+
+    # Initialiser les métriques AVANT de démarrer le serveur
+    metrics = PrometheusMetrics(flask_app)
+    metrics.info('app_info', 'Todo API', version='1.0.0')
+
+    # Démarrer le serveur
     app.run(port=8080)
 
 
