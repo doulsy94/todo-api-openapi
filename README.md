@@ -82,7 +82,7 @@ python -m openapi_server
 2. Запустите Prometheus, указав путь к конфигурации:
 
 ```bash
-prometheus.exe --config.file="C:\путь\к\prometheus.yml"
+.\prometheus.exe --config.file="C:\Users\Doul Sy\Desktop\labo-openapi-todo\prometheus.yml"
 Пример содержимого prometheus.yml:
 
 yaml
