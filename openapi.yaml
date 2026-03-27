@@ -56,6 +56,30 @@ paths:
                 $ref: '#/components/schemas/Task'
         '404':
           description: Task not found
+    patch:
+      summary: Updates a task (e.g., mark completed or change due date)
+      operationId: update_task
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Task not found
 components:
   schemas:
     Task:
@@ -70,6 +94,10 @@ components:
         completed:
           type: boolean
           example: false
+        due_date:
+          type: string
+          format: date
+          example: "2026-03-31"
       required:
         - id
         - title
@@ -83,5 +111,9 @@ components:
         completed:
           type: boolean
           example: false
+        due_date:
+          type: string
+          format: date
+          example: "2026-03-31"
       required:
         - title
