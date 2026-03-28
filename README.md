@@ -1,108 +1,186 @@
-# API управления задачами (To-Do) – лабораторные работы API First и мониторинг
+# API управления задачами (To-Do) – Полные лабораторные работы
 
-Этот репозиторий содержит исходный код REST API для управления списком задач (To-Do list), выполненной в рамках двух лабораторных работ:
+Этот репозиторий содержит исходный код REST API для управления списком задач, разработанный в рамках нескольких лабораторных работ:
 
 1. **API First с OpenAPI** – проектирование, генерация и реализация API на основе спецификации OpenAPI 3.0.
-2. **Мониторинг** – добавление метрик, их сбор с помощью Prometheus и визуализация в Grafana, включая **продуктовые метрики** (количество задач, выполненных задач, просроченных задач).
+2. **Мониторинг метрик** – добавление HTTP-метрик и продуктовых метрик (общее количество задач, выполненных, просроченных) с помощью Prometheus и визуализация в Grafana.
+3. **Мониторинг логов** – экспорт структурированных логов в формате JSON, сбор через Loki и визуализация в Grafana.
 
-## Описание работы
+## Описание работ
 
-### Часть 1: API First
-Целью первой части была реализация API в соответствии с методологией **API First** (design-first). Основные этапы:
+### 1. API First
+- Составление файла спецификации `openapi.yaml`, описывающего API.
+- Генерация каркаса сервера на Python/Flask с помощью OpenAPI Generator.
+- Реализация бизнес-логики (CRUD в памяти, срока выполнения задач).
+- Интерактивная документация Swagger UI.
 
-- **Разработка контракта**: создание файла `openapi.yaml`, описывающего ресурсы, методы, параметры и модели данных.
-- **Генерация скелета сервера**: использование инструмента **OpenAPI Generator** для автоматической генерации структуры сервера на Python с использованием Flask (генератор `python-flask`).
-- **Реализация бизнес-логики**: добавление кода для управления списком задач в памяти (создание, просмотр, поиск по ID, обновление).
-- **Интерактивное тестирование**: автоматически сгенерированная документация с помощью **Swagger UI**, позволяющая тестировать API непосредственно из браузера.
-
-### Часть 2: Мониторинг
-Вторая часть посвящена добавлению observability в проект:
-
-- **Инструментирование Flask-приложения** с помощью библиотеки `prometheus_flask_exporter` для сбора стандартных HTTP-метрик (количество запросов, время ответа, коды ответов).
-- **Продуктовые метрики**: добавлены пользовательские метрики:
+### 2. Метрики
+- Инструментирование приложения библиотекой `prometheus_flask_exporter`.
+- Пользовательские метрики:
   - `tasks_total` – общее количество задач
   - `tasks_completed` – количество выполненных задач
-  - `tasks_overdue` – количество просроченных задач (дата выполнения в прошлом и не выполнены)
-- **Настройка Prometheus** для сбора метрик с эндпоинта `/metrics`.
-- **Подключение Grafana** для визуализации собранных данных и создания дашборда, отображающего продуктовые метрики.
+  - `tasks_overdue` – количество просроченных задач (срок выполнения истёк, задача не выполнена)
+- Настройка Prometheus для сбора метрик с эндпоинта `/metrics`.
+- Создание дашборда в Grafana с метриками HTTP и продуктовыми метриками.
+
+### 3. Логи
+- Добавление структурированных логов в формате JSON с помощью `python-json-logger`.
+- Запись логов в файл `app.log`.
+- Установка и настройка **Loki** (агрегатор логов) и **Promtail** (сборщик логов).
+- Подключение Loki как источника данных в Grafana.
+- Создание дашборда для визуализации логов с возможностью поиска (например, `{job="todo-api"}`, фильтрация по уровню и т.д.).
 
 ## Используемые технологии
 
-- [OpenAPI 3.0.0](https://swagger.io/specification/) – спецификация API
-- [OpenAPI Generator](https://openapi-generator.tech/) (v7.20.0) – генерация кода
-- Python 3.8+ – язык реализации
-- [Flask](https://flask.palletsprojects.com/) / [Connexion](https://github.com/zalando/connexion) – веб-фреймворк
-- [Swagger UI](https://swagger.io/tools/swagger-ui/) – интерактивная документация
-- [Prometheus](https://prometheus.io/) – сбор и хранение метрик
-- [Grafana](https://grafana.com/) – визуализация метрик
-- [prometheus_flask_exporter](https://github.com/rycus86/prometheus_flask_exporter) – экспорт метрик из Flask
-- Git – система контроля версий
+- **OpenAPI 3.0.0** – спецификация
+- **OpenAPI Generator** (v7.20.0) – генерация кода
+- **Python 3.8+** – язык
+- **Flask / Connexion** – веб-фреймворк
+- **Swagger UI** – интерактивная документация
+- **Prometheus** – сбор метрик
+- **Grafana** – визуализация метрик и логов
+- **Loki** – агрегация логов
+- **Promtail** – сбор логов
+- **prometheus_flask_exporter** – экспорт метрик из Flask
+- **python-json-logger** – логи в JSON
 
 ## Установка и запуск
 
 ### Предварительные требования
-
-- Установленный Python 3.8 или выше
-- `pip` (менеджер пакетов Python)
-- Git (опционально, для клонирования)
-- [Prometheus](https://prometheus.io/download/) (скачайте и распакуйте архив)
-- [Grafana](https://grafana.com/grafana/download) (скачайте и установите)
+- Python 3.8 или выше
+- Git (опционально)
+- [Prometheus](https://prometheus.io/download/) (скачать и распаковать)
+- [Grafana](https://grafana.com/grafana/download) (скачать и установить)
+- [Loki и Promtail](https://github.com/grafana/loki/releases) (скачать архивы `loki-windows-amd64.exe.zip` и `promtail-windows-amd64.exe.zip`)
 
 ### Шаги
 
-1. **Клонировать репозиторий**
+#### 1. Клонировать репозиторий
+```bash
+git clone https://github.com/doulsy94/todo-api-openapi.git
+cd todo-api-openapi
+```
 
-   ```bash
-   git clone https://github.com/doulsy94/todo-api-openapi.git
-   cd todo-api-openapi
+2.**Установить зависимости Python**
 
-2. **Установить зависимости Python**
+  ```bash
   pip install -r requirements.txt
+  ```
 
-3. **Запустить сервер**
+3.**Запустить API**
+
+ ```bash
+  cd todo-api
   python -m openapi_server
+ ```
 
-  Сервер запустится по адресу http://localhost:8080.
-  Документация Swagger UI доступна на http://localhost:8080/ui/.
-  Метрики для Prometheus доступны на http://localhost:8080/metrics.
+  API будет доступно по адресу http://localhost:8080.
+  Swagger UI: http://localhost:8080/ui/
+  Метрики Prometheus: http://localhost:8080/metrics
 
-## Настройка мониторинга
-*Prometheus*
-1. Создайте файл конфигурации prometheus.yml (пример приведён ниже) или используйте готовый из репозитория.
+4.**Запустить Prometheus**
 
-2. Запустите Prometheus, указав путь к конфигурации:
-.(.venv) PS C:\prometheus> .\prometheus.exe --config.file="C:\Users\Doul Sy\Desktop\labo-openapi-todo\prometheus.yml"
+ -Поместите файл конфигурации prometheus.yml в папку Prometheus (или используйте приложенный).
 
-3. Проверьте, что цель todo-api появилась в статусе UP в веб-интерфейсе Prometheus по адресу http://localhost:9090/targets.
+ -Запустите Prometheus:
 
-*Grafana*
-1. Запустите Grafana (по умолчанию доступна на http://localhost:3000, логин/пароль: admin/admin).
+  ```bash
+  .(.venv) PS C:\prometheus> .\prometheus.exe --config.file="C:\Users\Doul Sy\Desktop\labo-openapi-todo\prometheus.yml"
+  ```
 
-2. Добавьте Prometheus как источник данных:
+  -Проверьте, что цель todo-api появилась в статусе UP в веб-интерфейсе Prometheus по адресу http://localhost:9090/targets
 
- - Configuration → Data Sources → Add data source → Prometheus.
+5.**Запустить Loki и Promtail**
+ -Распакуйте loki-windows-amd64.exe и promtail-windows-amd64.exe в папку (например, C:\loki).
 
- - В поле URL укажите http://localhost:9090.
+ -Создайте файлы конфигурации (примеры ниже).
 
- - Нажмите Save & Test.
+ -Запустите Loki:
 
-3. Создайте дашборд для отображения продуктовых метрик:
+ ```bash
+ (.venv) PS C:\loki> .\promtail-windows-amd64.exe --config.file=promtail-local-config.yaml 
+ ```
 
- - Добавьте новый panel с запросом tasks_total (тип Stat или Time series).
+ -Запустите Promtail:
 
- - Добавьте panel для tasks_completed.
+ ```bash
+ (.venv) PS C:\loki> .\promtail-windows-amd64.exe --config.file=promtail-local-config.yaml
+ ```
 
- - Добавьте panel для tasks_overdue.
+Пример loki-local-config.yaml:
 
- - Добавьте panel для процента выполнения: (tasks_completed / tasks_total) * 100 (единица измерения – percent).
+```yaml
+auth_enabled: false
+server:
+  http_listen_port: 3100
+common:
+  path_prefix: C:/loki/data
+  storage:
+    filesystem:
+      chunks_directory: C:/loki/data/chunks
+      rules_directory: C:/loki/data/rules
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+schema_config:
+  configs:
+    - from: 2020-05-15
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+limits_config:
+  allow_structured_metadata: true
+  volume_enabled: true
+```
 
-*Продуктовые метрики*
-API предоставляет следующие пользовательские метрики Prometheus:
+Пример promtail-local-config.yaml (укажите абсолютный путь к app.log):
 
-tasks_total – общее количество задач
+```yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+positions:
+  filename: C:/loki/positions.yaml
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+scrape_configs:
+  - job_name: todo-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: todo-api
+          __path__: "C:/Users/Doul Sy/Desktop/labo-openapi-todo/todo-api/app.log"
+```
 
-tasks_completed – количество выполненных задач
+6.**Настроить Grafana**
+  -Запустите Grafana (например, grafana-server.exe).
+  -Откройте http://localhost:3000 (логин admin/admin).
+  -Добавьте источник данных Prometheus (URL http://localhost:9090).
+  -Добавьте источник данных Loki (URL http://localhost:3100).
 
-tasks_overdue – количество просроченных задач (дата выполнения в прошлом, не выполнены)
+7.**Импортировать дашборды (или создать вручную)**
+Вы можете импортировать JSON-дашборд (если он есть в репозитории) или создать панели вручную.
 
-Эти метрики обновляются при каждом создании или изменении задачи (через POST и PATCH).
+Примеры запросов для метрик:
+
+  -tasks_total – общее количество задач
+
+  -tasks_completed – выполненные задачи
+
+  -tasks_overdue – просроченные задачи
+
+  -(tasks_completed / tasks_total) * 100 – процент выполнения
+
+Запросы Loki:
+
+  -{job="todo-api"} – все логи приложения
+
+  -{job="todo-api"} |= "ERROR" – только ошибки
+
+  -{job="todo-api"} | json | task_id="1" – логи по конкретной задаче

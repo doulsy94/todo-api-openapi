@@ -1,20 +1,43 @@
 #!/usr/bin/env python3
 
 import connexion
-from connexion.resolver import Resolver
+import logging
+import sys
 from prometheus_flask_exporter import PrometheusMetrics
+from pythonjsonlogger import jsonlogger
 from openapi_server import encoder
 from openapi_server.metrics import update_metrics
 from openapi_server.task_storage import tasks_db
 from openapi_server.controllers import default_controller
 
-class CustomResolver(Resolver):
+def setup_logging():
+    # Créer un logger root
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # Formateur JSON
+    formatter = jsonlogger.JsonFormatter(
+        fmt='%(asctime)s %(name)s %(levelname)s %(message)s %(module)s %(lineno)d'
+    )
+
+    # Handler console
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    # Handler fichier (pour Promtail)
+    file_handler = logging.FileHandler('app.log')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+setup_logging()
+
+class CustomResolver(connexion.resolver.Resolver):
     def __init__(self, function_map):
         super().__init__()
         self.function_map = function_map
 
     def resolve_function_from_operation_id(self, operation_id):
-        # Retourne la fonction correspondante depuis le dictionnaire
         return self.function_map.get(operation_id)
 
 def main():
@@ -27,7 +50,6 @@ def main():
         'get_task_by_id': default_controller.get_task_by_id,
         'update_task': default_controller.update_task,
     }
-
     resolver = CustomResolver(function_map)
 
     app.add_api(
