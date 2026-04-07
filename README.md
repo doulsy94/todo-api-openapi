@@ -1,3 +1,5 @@
+[![CI/CD Pipeline](https://github.com/doulsy94/todo-api-openapi/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/doulsy94/todo-api-openapi/actions/workflows/ci-cd.yml)
+
 # API управления задачами (To-Do) – Полные лабораторные работы
 
 Этот репозиторий содержит исходный код REST API для управления списком задач, разработанный в рамках пяти лабораторных работ, направленных на создание полноценной наблюдаемой системы (observability):
@@ -109,9 +111,9 @@
   python -m openapi_server
  ```
 
-  API будет доступно по адресу http://localhost:8080.
-  Swagger UI: http://localhost:8080/ui/
-  Метрики Prometheus: http://localhost:8080/metrics
+  API будет доступно по адресу <http://localhost:8080>.
+  Swagger UI: <http://localhost:8080/ui/>
+  Метрики Prometheus: <http://localhost:8080/metrics>
 
 4.**Запустить Prometheus**
 
@@ -136,8 +138,7 @@ scrape_configs:
     metrics_path: "/metrics"
 ```
 
--Проверьте, что цель todo-api появилась в статусе UP в веб-интерфейсе Prometheus по адресу http://localhost:9090/targets
-
+-Проверьте, что цель todo-api появилась в статусе UP в веб-интерфейсе Prometheus по адресу <http://localhost:9090/targets>
 
 5.**Запустить Loki и Promtail**
  -Распакуйте loki-windows-amd64.exe и promtail-windows-amd64.exe в папку (например, C:\loki).
@@ -211,7 +212,7 @@ scrape_configs:
 
 - Распаковать tempo.exe в папку (например, C:\tempo).
 - Создать tempo-local-config.yaml (пример – в репозитории).
-- Запустить: .\tempo.exe --config.file=tempo-local-config.yaml 
+- Запустить: .\tempo.exe --config.file=tempo-local-config.yaml
 
 Пример loki-local-config.yaml:
 
@@ -245,10 +246,10 @@ memberlist:
 
 7.**Настроить Grafana**
   -Запустите Grafana (например, grafana-server.exe).
-  -Откройте http://localhost:3000 (логин admin/admin).
-  -Добавьте источник данных Prometheus (URL http://localhost:9090).
-  -Добавьте источник данных Loki (URL http://localhost:3100).
-  -Добавьте источник данных Tempo (URL http://localhost:3200).
+  -Откройте <http://localhost:3000> (логин admin/admin).
+  -Добавьте источник данных Prometheus (URL <http://localhost:9090>).
+  -Добавьте источник данных Loki (URL <http://localhost:3100>).
+  -Добавьте источник данных Tempo (URL <http://localhost:3200>).
 
 8.**Импортировать дашборды (или создать вручную)**
 Вы можете импортировать JSON-дашборд (если он есть в репозитории) или создать панели вручную.
